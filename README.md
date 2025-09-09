@@ -29,8 +29,7 @@ A simple .NET 9.0 WinForms application that checks the Windows Event Log to dete
 - Click "Crash App" to trigger an unhandled exception (Windows will log Event IDs 1000/1001).
 
 ## Notes
-- You may need administrator privileges to read the Windows Event Log.
-- The app uses best practices for WinForms and event log access.
+- You will need to run the application as as Administrator the first time add the EventLogCrash Source to Windows Event Log.
 
 ## Release History
 
