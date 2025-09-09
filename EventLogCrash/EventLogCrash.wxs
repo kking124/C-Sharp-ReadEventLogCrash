@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+    <Product Id="*" Name="EventLogCrash" Language="1033" Version="1.1.0.0" Manufacturer="rad13"
+        UpgradeCode="A1B2C3D4-E5F6-47A8-9B0C-123456789ABC">
+        <Package InstallerVersion="500" Compressed="yes" InstallScope="perMachine" Platform="x64" />
+        <MajorUpgrade DowngradeErrorMessage="A newer version of EventLogCrash is already installed." />
+        <MediaTemplate />
+        
+        <!-- UI and dialogs -->
+        <UIRef Id="WixUI_InstallDir" />
+        <UIRef Id="WixUI_ErrorProgressText" />
+        
+        <!-- License file for installer -->
+        <WixVariable Id="WixUILicenseRtf" Value="license.rtf" />
+        <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+        
+        <UI>
+            <Publish Dialog="ExitDialog" Control="Finish" Event="DoAction" Value="LaunchApplication">WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1 and NOT Installed</Publish>
+        </UI>
+        
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT" Value="Launch EventLogCrash" />
+        <Property Id="WIXUI_EXITDIALOGOPTIONALCHECKBOX" Value="1" />
+        
+        <CustomAction Id="LaunchApplication" 
+                      FileKey="MainExecutable" 
+                      ExeCommand="" 
+                      Execute="immediate" 
+                      Impersonate="yes" 
+                      Return="asyncNoWait" />
+
+        <Feature Id="ProductFeature" Title="EventLogCrash" Level="1">
+            <ComponentGroupRef Id="ProductComponents" />
+            <ComponentRef Id="StartMenuShortcut" />
+        </Feature>
+
+        <Directory Id="TARGETDIR" Name="SourceDir">
+            <Directory Id="ProgramFiles64Folder">
+                <Directory Id="INSTALLFOLDER" Name="EventLogCrash" />
+            </Directory>
+            <Directory Id="ProgramMenuFolder">
+                <Directory Id="ApplicationProgramsFolder" Name="EventLogCrash" />
+            </Directory>
+        </Directory>
+
+        <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+            <Component Id="MainExecutable" Guid="B2A1A7B2-1C2B-4E3A-9A1B-123456789ABC" Win64="yes">
+                <File Id="MainExecutable" Source="bin\Release\net9.0-windows\publish\EventLogCrash.exe" KeyPath="yes" />
+                <File Id="FaviconIcon" Source="favicon.ico" />
+                <File Id="MainDll" Source="bin\Release\net9.0-windows\publish\EventLogCrash.dll" />
+                <File Id="DepsJson" Source="bin\Release\net9.0-windows\publish\EventLogCrash.deps.json" />
+                <File Id="PdbFile" Source="bin\Release\net9.0-windows\publish\EventLogCrash.pdb" />
+                <File Id="RuntimeConfig" Source="bin\Release\net9.0-windows\publish\EventLogCrash.runtimeconfig.json" />
+                
+                <!-- Event log source registry entries -->
+                <RegistryKey Root="HKLM" Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\EventLogCrash">
+                    <RegistryValue Name="EventMessageFile" Type="string" Value="[#MainExecutable]" />
+                    <RegistryValue Name="TypesSupported" Type="integer" Value="7" />
+                </RegistryKey>
+            </Component>
+        </ComponentGroup>
+
+        <!-- Start Menu shortcut component -->
+        <Component Id="StartMenuShortcut" Directory="ApplicationProgramsFolder" Guid="D4C3B2A1-3E4D-6F5E-BC3D-345678901CDE" Win64="yes">
+            <Shortcut Id="ApplicationStartMenuShortcut"
+                      Name="EventLogCrash"
+                      Description="EventLogCrash Application"
+                      Target="[#MainExecutable]"
+                      WorkingDirectory="INSTALLFOLDER"
+                      Icon="ProductIcon" />
+            <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall" />
+            <RegistryValue Root="HKCU" Key="Software\rad13\EventLogCrash" Name="installed" Type="integer" Value="1" KeyPath="yes" />
+        </Component>
+
+        <!-- Icon definition -->
+        <Icon Id="ProductIcon" SourceFile="favicon.ico" />
+        
+        <!-- Add icon to Add/Remove Programs -->
+        <Property Id="ARPPRODUCTICON" Value="ProductIcon" />
+    </Product>
+</Wix>
